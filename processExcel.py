@@ -4,7 +4,7 @@ import calendar
 import datetime
 
 MAX = 5
-week_total = 37
+week_total = 55
 # Semanal, Bisemanal, Trisemanal
 
 class Task:
@@ -21,6 +21,15 @@ class Week:
         self.week_number = week_number
         self.tasks_duration = tasks_duration
         self.tasks = [] # list of task ids
+
+def register_planned_task(task_id):
+  if task_id in plannedTasks:
+    return
+  else:
+   plannedTasks[task_id]=1
+
+def count_planned_tasks(): 
+  print("#planned tasks is", len(plannedTasks), "and #total tasks is ", len(tasks))
 
 def storeTasks():
     i=0
@@ -82,6 +91,7 @@ def allocateTasks(curr_week_number): # one week's tasks according to frequency, 
         if frequency == 'Semanal': 
            for task_id in freq[frequency]: 
                week_tasks_duration = week_tasks_duration + tasks[task_id].duration 
+               register_planned_task(task_id)
                #print( '  debug TASK', task_id, ' Semanal  duration is ', week_tasks_duration)
            week_task_list = freq[frequency].copy()              
       
@@ -95,16 +105,17 @@ def allocateTasks(curr_week_number): # one week's tasks according to frequency, 
             #   print(' curr week is', curr_week_number, '> ', interval)
 
 
-              if curr_week_number > interval :  #if task was performed precisely on the interval , MUST be allocate
+              if curr_week_number > interval :  #if task was performed precisely on the interval ,then it MUST be allocateon the current week
                 prior_week_number =  curr_week_number - interval                
-                if  task_id in tasksperWeek[prior_week_number]: 
+                if task_id in tasksperWeek[prior_week_number]: 
                   week_task_list.append(task_id)
                   tasksperWeek[curr_week_number]= list(week_task_list)
                   curr_task = tasks[task_id]
                   week_tasks_duration = week_tasks_duration + curr_task.duration
+                  register_planned_task(task_id)
                   continue
 
-              # #if task was performed previously the interval , MUST be allocate TODO relate to interval th e condition
+              # #if task was performed previously to the interval , MUST be allocate TODO relate to interval th e condition
               prior_week_number = curr_week_number - 1
               while  prior_week_number > 0 and curr_week_number - prior_week_number <= interval:  
                   if task_id in tasksperWeek[prior_week_number]:  
@@ -124,16 +135,17 @@ def allocateTasks(curr_week_number): # one week's tasks according to frequency, 
                 # if task was not performed,check if can be  allocated 
                   curr_task = tasks[task_id]
                   week_tasks_duration = week_tasks_duration + curr_task.duration 
-
+                   
                   if week_tasks_duration  <= MAX:
                      week_task_list.append(task_id)
                      tasksperWeek[curr_week_number]= list(week_task_list)
+                     register_planned_task(task_id)
                     #  print('  ?task YES', curr_task.id, 'curr_task.duration ', curr_task.duration, 'frequency', frequency,' Week duration : ', week_tasks_duration )
                   else:
                      week_tasks_duration = week_tasks_duration - curr_task.duration
                     #  print('  ?task NO', curr_task.id, 'curr_task.duration ', curr_task.duration,' Week duration : ', week_tasks_duration  )
  
-                  if round(week_tasks_duration) == MAX:
+                  if round(week_tasks_duration) == MAX: # if maximum weekly time for tasks has been reached then stop
                     #  print( "  debug break inside for tasks  in frequency")
                      break
                      
@@ -165,25 +177,23 @@ tasks = dict()# key:task_id, value: Object Task
 
 tasksperWeek = dict() ##  key: week_number, value: Object Week list of tasks_ids and
 
+plannedTasks = dict() ## key: task_id , value: number of task occurences planned 
 
 storeTasks() # fill freq and tasks dictionaries 
 print(  '------------------------- Total tasks number is' , len(tasks))
 
 #    current_week = datetime.date(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day).strftime("%V")
-totalCounter = []
 i=1
 while i <= week_total:
   allocateTasks(i)
-  
-#   totalCounter.append(tasksperWeek[i]) # count distinct allocated tasks
   i = i+1
 
-
-print("Total allocated tasks", len( set(totalCounter)))
- 
+count_planned_tasks()
+#print("planned", sorted(plannedTasks.keys()))
 # write_to_excel()
 ## conditions:
 ## frequency is repected
+
 #### one week tasks duration <=8 hours  
 
 # if semanal, bisemanal, and triseanal exists
