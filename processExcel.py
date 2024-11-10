@@ -2,9 +2,10 @@ import openpyxl
 import pylightxl as xl
 import calendar
 import datetime
+import string
 
 MAX = 5
-week_total = 55
+week_total = 30
 # Semanal, Bisemanal, Trisemanal
 
 class Task:
@@ -154,19 +155,48 @@ def allocateTasks(curr_week_number): # one week's tasks according to frequency, 
     print(tasksperWeek[curr_week_number])
     #week = Week(week_number, week_tasks_duration, week_task_list)
 
+def create_column_list():
+   
+    #list of 26 first elements list(string.ascii_uppercase)
+    
+    number_of_cols = len( tasksperWeek) 
+    list_of_cols_names = []
+    
+    list_of_cols_names =list(string.ascii_uppercase)
+  
+    counter = len(list_of_cols_names)
+    i = 0
 
+    while counter < number_of_cols:## assuming number of weeks is >26
+     for col in list(string.ascii_uppercase):
+       #print(list_of_cols_names[i] + col)
+       column=list_of_cols_names[i] + col
+       list_of_cols_names.append(column)
+       counter = counter +1
+       if counter >= number_of_cols:
+          break 
+     i=i+1
+  #  print( 'number of weeks is ', counter, 'and  column list is ', list_of_cols_names, 'size is', len(list_of_cols_names))
+    return list_of_cols_names
 
-def write_to_excel():
+   
+         
+def write_calendar_to_excel():
     wb = openpyxl.load_workbook('/Users/maf/Desktop/tarefas2.xlsx')
     mysheet = wb.create_sheet(index=4, title='St')
-    i=0
-    while i < len( tasksperWeek.keys()):
-        print(i)
-        i = i+1
-        cell='A'+str(i)
-        mysheet[cell] = 'Writing new Value!'
-        mysheet[cell].value
-
+    
+    cols = create_column_list() 
+    # week number , tasks 
+    for week in sorted(tasksperWeek.keys(),reverse = True):
+        column_name = cols.pop()
+        i=1
+        mysheet[ str(column_name) +str(i)] = 'week ' + str(week)
+     #   mysheet[cell].value
+        i = i + 1
+        for task in tasksperWeek[week]:
+          print(column_name , 'and ', i)
+          mysheet[str(column_name) +str(i)] =  str(tasks[i].place) +': '+ str(tasks[i].description)  
+          i = i + 1
     wb.save('/Users/maf/Desktop/tarefas2.xlsx')
 
 # readxl returnsa  pylightxl database that holds all worksheets and its data
@@ -182,22 +212,19 @@ plannedTasks = dict() ## key: task_id , value: number of task occurences planned
 storeTasks() # fill freq and tasks dictionaries 
 print(  '------------------------- Total tasks number is' , len(tasks))
 
-#    current_week = datetime.date(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day).strftime("%V")
 i=1
 while i <= week_total:
   allocateTasks(i)
   i = i+1
+## conditions:
+### frequency is repected
+### tasks duration <= MAX hours  
 
 count_planned_tasks()
 #print("planned", sorted(plannedTasks.keys()))
-# write_to_excel()
-## conditions:
-## frequency is repected
 
-#### one week tasks duration <=8 hours  
-
-# if semanal, bisemanal, and triseanal exists
-
+write_calendar_to_excel()
+#   current_week = datetime.date(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day).strftime("%V")
 
 
     
