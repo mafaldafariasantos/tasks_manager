@@ -204,31 +204,44 @@ def write_calendar_to_excel():
 ################### ################### ################### 
 
 # readxl returnsa  pylightxl database that holds all worksheets and its data
-db = xl.readxl(fn='/Users/maf/Desktop/tarefas.xlsx')
+# db = xl.readxl(fn='/Users/maf/Desktop/tarefas.xlsx')
 
-freq = dict() # key: task's execution frequency, value: list of task_ids
-tasks = dict()# key:task_id, value: Object Task
+# freq = dict() # key: task's execution frequency, value: list of task_ids
+# tasks = dict()# key:task_id, value: Object Task
 
-tasksperWeek = dict() ##  key: week_number, value: Object Week list of tasks_ids and
+# tasksperWeek = dict() ##  key: week_number, value: Object Week list of tasks_ids and
 
-plannedTasks = dict() ## key: task_id , value: number of task occurences planned 
+# plannedTasks = dict() ## key: task_id , value: number of task occurences planned 
 
-storeTasks() # fill freq and tasks dictionaries 
-print(  '------------------------- Total tasks number is' , len(tasks))
+# storeTasks() # fill freq and tasks dictionaries 
+# print(  '------------------------- Total tasks number is' , len(tasks))
 
-i=1
-while i <= week_total:
-  allocateTasks(i)
-  i = i+1
-## conditions:
-### frequency is repected
-### tasks duration <= MAX hours  
+# i=1
+# while i <= week_total:
+#   allocateTasks(i)
+#   i = i+1
+# ## conditions:
+# ### frequency is repected
+# ### tasks duration <= MAX hours  
 
-count_planned_tasks()
-#print("planned", sorted(plannedTasks.keys()))
+# count_planned_tasks()
+# #print("planned", sorted(plannedTasks.keys()))
 
-write_calendar_to_excel()
-#   current_week = datetime.date(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day).strftime("%V")
+#write_calendar_to_excel()
 
+# current number in one year
+current_week = datetime.date(datetime.date.today().year, datetime.date.today().month, datetime.date.today().day).strftime("%V")
+#next_week= current_week_other + datetime.timedelta(days=7)
 
-    
+today = datetime.date.today()
+# today = today - datetime.timedelta(days=2)
+if today.weekday() > 0:
+   monday = today - datetime.timedelta(days=today.weekday())
+else:
+   monday = today 
+#print( 'today is', today, today.weekday(), 'week started at ',monday )
+# next week monday
+print('curr week is ', current_week,' started at monday', monday,'next monday is ', monday + datetime.timedelta(weeks=1))
+
+# Excel column example:
+# 11/18-11 , 1 
