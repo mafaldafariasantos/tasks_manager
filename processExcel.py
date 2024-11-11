@@ -199,6 +199,10 @@ def write_calendar_to_excel():
           i = i + 1
     wb.save('/Users/maf/Desktop/tarefas2.xlsx')
 
+################### ################### ################### 
+###################         MAIN        ################### 
+################### ################### ################### 
+
 # readxl returnsa  pylightxl database that holds all worksheets and its data
 db = xl.readxl(fn='/Users/maf/Desktop/tarefas.xlsx')
 
